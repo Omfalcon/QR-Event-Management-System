@@ -1,0 +1,12 @@
+flask
+flask-cors
+python-dotenv
+pymongo
+bcrypt
+pyjwt
+requests
+pandas
+openpyxl
+qrcode
+pillow
+pytz

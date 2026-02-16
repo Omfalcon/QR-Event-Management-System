@@ -1,0 +1,101 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Safe area insets for mobile devices */
+:root {
+  --safe-area-inset-top: env(safe-area-inset-top);
+  --safe-area-inset-bottom: env(safe-area-inset-bottom);
+}
+
+html,
+body {
+  padding-bottom: var(--safe-area-inset-bottom);
+  overscroll-behavior-y: none;
+}
+
+@layer base {
+  body {
+    font-family: 'Manrope', sans-serif;
+    -webkit-tap-highlight-color: transparent;
+    @apply bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 min-h-screen;
+  }
+}
+
+.material-symbols-outlined {
+  font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+}
+
+/* Custom scrollbar hiding utility */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* Scanner styles */
+.scanner-frame {
+  box-shadow: 0 0 0 9999px rgba(16, 22, 34, 0.85);
+}
+
+.scan-line {
+  height: 2px;
+  background: linear-gradient(to right, transparent, #135bec, transparent);
+  box-shadow: 0 0 15px #135bec;
+  position: absolute;
+  width: 100%;
+  top: 50%;
+  animation: scan 2s linear infinite;
+}
+
+@keyframes scan {
+  0% {
+    top: 0;
+  }
+
+  50% {
+    top: 100%;
+  }
+
+  100% {
+    top: 0;
+  }
+}
+
+/* Override html5-qrcode default styles */
+#qr-reader {
+  border: none !important;
+}
+
+#qr-reader__dashboard_section {
+  display: none !important;
+}
+
+#qr-reader__camera_selection {
+  margin-top: 1rem;
+}
+
+#qr-reader video {
+  border-radius: 0.75rem;
+  object-fit: cover;
+}
+
+/* Notification animation */
+@keyframes slide-down {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-slide-down {
+  animation: slide-down 0.3s ease-out;
+}
