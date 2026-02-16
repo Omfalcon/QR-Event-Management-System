@@ -1,14 +1,16 @@
-import { useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTheme } from '../context/ThemeContext';
 import { API_BASE_URL, getAuthHeaders } from '../config';
 import upesLogo from '../assets/upeslogo.jpeg';
 import { useBackButton } from '../hooks/useBackButton';
 import ScannerList from '../components/ScannerList';
+import AboutFooter from '../components/AboutFooter';
 
 const ManagerDashboard = () => {
     const navigate = useNavigate();
     const { theme, toggleTheme } = useTheme();
+
     useBackButton();
 
     // Verify Session on Load
@@ -79,15 +81,7 @@ const ManagerDashboard = () => {
                 {/* SCANNER LIST (MANAGER MODE - NO LOGS) */}
                 <ScannerList isSuperAdmin={false} />
 
-                {/* MANAGER FOOTER TEXT */}
-                <div className="p-4 text-center text-gray-400 dark:text-gray-600 space-y-1 opacity-80 mt-4">
-                    <p className="text-[10px] font-bold uppercase tracking-widest opacity-50">Powered By</p>
-                    <div className="flex items-center justify-center gap-3">
-                        <span className="font-black text-xl tracking-tighter text-gray-600 dark:text-gray-300">UPES</span>
-                        <span className="text-gray-300 dark:text-gray-700 text-lg font-light">|</span>
-                        <span className="font-bold text-xs tracking-wide">R&D TEAM</span>
-                    </div>
-                </div>
+                <AboutFooter />
             </main>
 
             {/* MANAGER BOTTOM NAV */}

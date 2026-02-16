@@ -1,12 +1,14 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTheme } from '../context/ThemeContext';
 import upesLogo from '../assets/upeslogo.jpeg';
 import { useBackButton } from '../hooks/useBackButton';
+import AboutFooter from '../components/AboutFooter';
 
 const AdminDashboard = () => {
     const navigate = useNavigate();
     const { theme, toggleTheme } = useTheme();
+
 
     // Prevent back navigation on dashboard
     useBackButton();
@@ -138,17 +140,7 @@ const AdminDashboard = () => {
                     </div>
                 </div>
 
-                {/* Custom Watermark Footer */}
-                <div className="mt-auto pt-8 pb-2 flex flex-col items-center justify-center gap-1.5 opacity-70">
-                    <div className="flex items-center gap-2 text-gray-500 dark:text-gray-400">
-                        <span className="text-[10px] font-bold tracking-widest uppercase">Powered By</span>
-                        <span className="w-3 h-[1px] bg-gray-300 dark:bg-gray-700"></span>
-                        <span className="text-[11px] font-black tracking-tight uppercase">UPES | R&D</span>
-                    </div>
-                    <p className="text-[10px] font-medium text-gray-500 dark:text-gray-500">
-                        Developed by Om Agarwal <span className="mx-1.5 opacity-40">|</span> Guided by Shubhi Sharma
-                    </p>
-                </div>
+                <AboutFooter />
             </main>
         </div>
     );

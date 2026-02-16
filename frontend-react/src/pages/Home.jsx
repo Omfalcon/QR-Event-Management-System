@@ -1,11 +1,13 @@
 import { Link } from 'react-router-dom';
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { useTheme } from '../context/ThemeContext';
 import upesLogo from '../assets/upeslogo.jpeg';
+import AboutFooter from '../components/AboutFooter';
 
 export default function Home() {
     const { theme, toggleTheme } = useTheme();
     const [isProfileOpen, setIsProfileOpen] = useState(false);
+
 
     return (
         <>
@@ -172,7 +174,7 @@ export default function Home() {
                 </div>
             </div>
 
-            <div className="mt-8 px-4 mb-8 animate-slide-up" style={{ animationDelay: '0.5s' }}>
+            <div className="mt-6 px-4 mb-0 animate-slide-up" style={{ animationDelay: '0.5s' }}>
                 <div className="bg-gradient-to-r from-primary/10 via-primary/5 to-transparent border border-primary/20 p-4 rounded-2xl flex items-start gap-4 shadow-sm relative overflow-hidden">
                     <div className="absolute -right-4 -top-4 size-24 bg-primary/5 rounded-full blur-xl animate-pulse"></div>
                     <div className="bg-white dark:bg-primary p-2.5 rounded-xl text-primary dark:text-white shadow-sm z-10">
@@ -187,6 +189,9 @@ export default function Home() {
                     </div>
                 </div>
             </div>
+
+            {/* About Popup */}
+            <AboutFooter />
         </>
     );
 }
