@@ -125,7 +125,10 @@ const ScannerList = ({ isSuperAdmin }) => {
                     </div>
 
                     {/* Room Cards */}
-                    {['Room 1005', 'Room 1006', 'Room 1007', 'Room 1008'].map((room, index) => (
+                    {(selectedDay === 2
+                        ? ['Room 1005', 'Trust Room', 'AB1', 'BUZZ']
+                        : ['Room 1005', 'Room 1006', 'AB1', 'BUZZ']
+                    ).map((room, index) => (
                         <div key={index} className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-xl p-4 flex flex-col gap-3 shadow-sm">
                             <div className="flex justify-between items-start">
                                 <div>

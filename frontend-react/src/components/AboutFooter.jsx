@@ -29,6 +29,7 @@ const AboutFooter = () => {
                         <button
                             onClick={() => setIsOpen(false)}
                             className="absolute top-4 right-4 size-8 flex items-center justify-center rounded-full bg-gray-100 dark:bg-white/5 text-gray-500 hover:text-gray-900 dark:hover:text-white transition-colors border border-transparent dark:border-white/5"
+                            aria-label="Close"
                         >
                             <span className="material-symbols-outlined text-[18px]">close</span>
                         </button>
@@ -50,10 +51,10 @@ const AboutFooter = () => {
                                 <div className="flex items-center justify-between">
                                     <h3 className="text-[17px] font-black text-gray-900 dark:text-white leading-tight">Om Agarwal</h3>
                                     <div className="flex gap-1.5">
-                                        <a href="#" className="size-8 rounded-full bg-indigo-50 dark:bg-indigo-500/10 flex items-center justify-center text-indigo-600 dark:text-indigo-400 hover:scale-105 transition-transform">
+                                        <a href="#" className="size-8 rounded-full bg-indigo-50 dark:bg-indigo-500/10 flex items-center justify-center text-indigo-600 dark:text-indigo-400 hover:scale-105 transition-transform" aria-label="LinkedIn">
                                             <span className="material-symbols-outlined text-[16px]">link</span>
                                         </a>
-                                        <a href="#" className="size-8 rounded-full bg-indigo-50 dark:bg-indigo-500/10 flex items-center justify-center text-indigo-600 dark:text-indigo-400 hover:scale-105 transition-transform">
+                                        <a href="#" className="size-8 rounded-full bg-indigo-50 dark:bg-indigo-500/10 flex items-center justify-center text-indigo-600 dark:text-indigo-400 hover:scale-105 transition-transform" aria-label="Email">
                                             <span className="material-symbols-outlined text-[16px]">alternate_email</span>
                                         </a>
                                     </div>
@@ -66,7 +67,7 @@ const AboutFooter = () => {
                                 <div className="flex items-center justify-between">
                                     <h3 className="text-[17px] font-black text-gray-900 dark:text-white leading-tight">Dr. Shubhi Sharma</h3>
                                     <div className="flex gap-1.5">
-                                        <a href="#" className="size-8 rounded-full bg-purple-50 dark:bg-purple-500/10 flex items-center justify-center text-purple-600 dark:text-purple-400 hover:scale-105 transition-transform">
+                                        <a href="#" className="size-8 rounded-full bg-purple-50 dark:bg-purple-500/10 flex items-center justify-center text-purple-600 dark:text-purple-400 hover:scale-105 transition-transform" aria-label="LinkedIn">
                                             <span className="material-symbols-outlined text-[16px]">link</span>
                                         </a>
                                     </div>

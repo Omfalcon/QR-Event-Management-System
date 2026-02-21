@@ -3,6 +3,7 @@ import os
 import uuid
 import io
 import qrcode
+from PIL import Image, ImageDraw, ImageFont
 from config import participants
 from mail_service import send_mail_with_qr
 
@@ -76,8 +77,35 @@ def process_excel_upload_stream(file_path):
             qr.add_data(uid)
             qr.make(fit=True)
             
+            qr_img = qr.make_image(fill_color="black", back_color="white").convert('RGB')
+            try:
+                font = ImageFont.truetype("arial.ttf", 40)
+            except IOError:
+                font = ImageFont.load_default()
+                
+            text = "IYRC2026"
+
+            dummy_draw = ImageDraw.Draw(qr_img)
+            text_bbox = dummy_draw.textbbox((0, 0), text, font=font)
+            text_width = text_bbox[2] - text_bbox[0]
+            text_height = text_bbox[3] - text_bbox[1]
+            
+            # New Image dimensions
+            new_width = qr_img.width
+            new_height = qr_img.height + text_height + 20 # 20px padding
+            
+            final_img = Image.new('RGB', (new_width, new_height), 'white')
+            draw = ImageDraw.Draw(final_img)
+            
+            # Paste QR
+            final_img.paste(qr_img, (0, text_height + 10))
+            
+            # Draw Text
+            text_x = (new_width - text_width) // 2
+            draw.text((text_x, 5), text, fill="black", font=font)
+            
             img_buffer = io.BytesIO()
-            qr.make_image(fill_color="black", back_color="white").save(img_buffer, format="PNG")
+            final_img.save(img_buffer, format="PNG")
             img_bytes = img_buffer.getvalue()
 
             # Send Email

@@ -5,7 +5,7 @@ from typing import Optional
 
 VALID_DAYS = {1, 2, 3}
 VALID_TYPES = {"attendance", "morning-tea", "lunch", "afternoon-tea"}
-VALID_ROOMS = {"Mac", "Room 1005", "Room 1006", "Room 1007", "Room 1008"}
+VALID_ROOMS = {"Mac", "Room 1005", "Room 1006", "Trust Room", "AB1", "BUZZ"}
 VALID_SLOTS = {"morning-tea", "lunch", "afternoon-tea"}
 
 

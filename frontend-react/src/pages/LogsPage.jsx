@@ -3,7 +3,14 @@ import { useSearchParams, useNavigate } from 'react-router-dom';
 import { API_BASE_URL, getAuthHeaders } from '../config';
 import { useBackButton } from '../hooks/useBackButton';
 
-const rooms = ["All", { label: "MAC", value: "Mac" }, "Room 1005", "Room 1006", "Room 1007", "Room 1008"];
+const getRooms = (day) => [
+    "All",
+    { label: "MAC", value: "Mac" },
+    "Room 1005",
+    day === 2 ? "Trust Room" : "Room 1006",
+    "AB1",
+    "BUZZ",
+];
 
 const meals = [
     { label: "All", value: "All" },
@@ -213,7 +220,7 @@ const LogsPage = () => {
 
                     {/* 3. Filter Chips - Glassy Scroll */}
                     <div className="flex gap-2 overflow-x-auto custom-scrollbar pb-1">
-                        {(activeTab === "attendance" ? rooms : meals).map((item) => {
+                        {(activeTab === "attendance" ? getRooms(selectedDay) : meals).map((item) => {
                             const label = typeof item === 'string' ? item : item.label;
                             const val = typeof item === 'string' ? item : item.value;
 
@@ -305,8 +312,14 @@ const LogCard = ({ log, type, formatSlot }) => {
     const initials = name.split(" ").map(n => n[0]).join("").substring(0, 2).toUpperCase();
     const isValid = log.status === 'valid';
 
+    const knownNames = ['AB1', 'BUZZ', 'Trust Room'];
     const subText = type === 'attendance'
-        ? (log.room ? (log.room === 'Mac' ? 'MAC' : (log.room.includes("Room") ? log.room : `Room ${log.room}`)) : "Unknown Room")
+        ? (log.room
+            ? (log.room === 'Mac' ? 'MAC'
+                : (log.room.startsWith('Room') || knownNames.includes(log.room)
+                    ? log.room
+                    : `Room ${log.room}`))
+            : 'Unknown Room')
         : formatSlot(log.slot);
 
     return (
