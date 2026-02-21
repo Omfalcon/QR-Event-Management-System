@@ -3,7 +3,7 @@ from flask import request, jsonify, send_file
 import tempfile
 import json
 import pytz
-from config import scan_logs, participants
+from config import scan_logs, participants, admin_scan_counts
 
 def format_to_ist(dt, fmt="%I:%M %p"):
     """Convert UTC/naive datetime to IST string"""
@@ -117,3 +117,20 @@ def download_logs():
         download_name="Event_Logs.json",
         mimetype="application/json"
     )
+
+
+def get_admin_counts():
+    """Returns admin scan counts grouped by day and slot type"""
+    records = list(admin_scan_counts.find({}, {"_id": 0}))
+
+    # Group into { "1": { "morning-tea": 3, "lunch": 5 }, "2": {...}, "3": {...} }
+    result = {}
+    for r in records:
+        day_key = str(r.get("day", ""))
+        slot_type = r.get("type", "")
+        count = r.get("count", 0)
+        if day_key not in result:
+            result[day_key] = {}
+        result[day_key][slot_type] = count
+
+    return jsonify({"admin_counts": result}), 200

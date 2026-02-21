@@ -1,9 +1,9 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 const ScannerList = ({ isSuperAdmin }) => {
     const navigate = useNavigate();
-    const [selectedDay, setSelectedDay] = React.useState(1);
+    const [selectedDay, setSelectedDay] = useState(1);
 
     const schedules = {
         1: [

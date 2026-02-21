@@ -114,6 +114,7 @@ const ScanPage = () => {
 
     const handleScanSuccess = async (decodedText) => {
         let uuid;
+        let qrPayload; // full parsed object to send to backend
         try {
             const parsed = JSON.parse(decodedText);
             uuid = parsed.uuid;
@@ -124,6 +125,7 @@ const ScanPage = () => {
                 setMsg({ type: "error", text: "Invalid QR Code Format" });
                 return;
             }
+            qrPayload = parsed; // keep full object (includes adminpass if present)
         } catch (e) {
             // Handle plain UUID strings (backward compatibility)
             uuid = decodedText;
@@ -132,6 +134,7 @@ const ScanPage = () => {
                 setMsg({ type: "error", text: "Invalid QR Code" });
                 return;
             }
+            qrPayload = { uuid };
         }
 
         if (!uuid) {
@@ -145,7 +148,7 @@ const ScanPage = () => {
             const res = await fetch(`${API_BASE_URL}/api/qr/validate`, {
                 method: "POST",
                 headers: getAuthHeaders(),
-                body: JSON.stringify({ uuid })
+                body: JSON.stringify(qrPayload)  // ✅ send full payload including adminpass
             });
 
             const data = await res.json();
@@ -189,7 +192,8 @@ const ScanPage = () => {
                     day: dayNum,  // Use validated number
                     type,
                     slot,
-                    room
+                    room,
+                    is_admin: user.is_admin || false
                 })
             });
 
@@ -197,7 +201,10 @@ const ScanPage = () => {
             setLoading(false);
 
             if (res.status === 200) {
-                setMsg({ type: "success", text: "✅ Entry Confirmed!" });
+                const successText = data.count
+                    ? `✅ Admin Scan #${data.count}`
+                    : "✅ Entry Confirmed!";
+                setMsg({ type: "success", text: successText });
 
                 setTimeout(() => {
                     setUser(null);
@@ -307,17 +314,32 @@ const ScanPage = () => {
                 {/* CONFIRMATION UI */}
                 {user && (
                     <div className="w-full max-w-md bg-white dark:bg-gray-800 rounded-3xl shadow-xl dark:shadow-2xl border border-gray-200 dark:border-gray-700 animate-slide-up overflow-hidden">
-                        <div className="bg-white dark:bg-gray-900 text-gray-900 dark:text-white p-8 text-center relative">
-                            <div className="size-24 bg-emerald-100 dark:bg-emerald-900/30 rounded-full mx-auto mb-4 flex items-center justify-center border-4 border-white dark:border-gray-900 shadow-sm">
-                                <span className="material-symbols-outlined text-5xl text-emerald-600 dark:text-emerald-400">qr_code_2</span>
+                        <div className={`p-8 text-center relative ${user.is_admin ? 'bg-amber-50 dark:bg-amber-900/20' : 'bg-white dark:bg-gray-900'} text-gray-900 dark:text-white`}>
+                            <div className={`size-24 rounded-full mx-auto mb-4 flex items-center justify-center border-4 shadow-sm ${user.is_admin
+                                ? 'bg-amber-100 dark:bg-amber-900/40 border-amber-300 dark:border-amber-700'
+                                : 'bg-emerald-100 dark:bg-emerald-900/30 border-white dark:border-gray-900'
+                                }`}>
+                                <span className={`material-symbols-outlined text-5xl ${user.is_admin ? 'text-amber-600 dark:text-amber-400' : 'text-emerald-600 dark:text-emerald-400'
+                                    }`}>
+                                    {user.is_admin ? 'admin_panel_settings' : 'qr_code_2'}
+                                </span>
                             </div>
-                            <h2 className="text-2xl font-black leading-tight mb-1">QR Code Scanned</h2>
-                            {user.name && (
+                            {user.is_admin && (
+                                <span className="inline-block bg-amber-500 text-white text-[10px] font-black uppercase tracking-widest px-3 py-1 rounded-full mb-2">
+                                    ADMIN SCAN
+                                </span>
+                            )}
+                            <h2 className="text-2xl font-black leading-tight mb-1">
+                                {user.is_admin ? 'Admin QR Detected' : 'QR Code Scanned'}
+                            </h2>
+                            {user.name && !user.is_admin && (
                                 <div className="mb-2">
                                     <h3 className="text-lg font-bold text-gray-900 dark:text-white">{user.name}</h3>
                                 </div>
                             )}
-                            <p className="text-gray-600 dark:text-gray-400 font-medium text-sm">Confirm to validate entry</p>
+                            <p className="text-gray-600 dark:text-gray-400 font-medium text-sm">
+                                {user.is_admin ? 'Tap Confirm to record this admin scan' : 'Confirm to validate entry'}
+                            </p>
                         </div>
 
                         <div className="p-6 bg-gray-50 dark:bg-gray-800/50 border-t border-dashed border-gray-300 dark:border-gray-700 relative">
@@ -334,7 +356,10 @@ const ScanPage = () => {
                                 <button
                                     onClick={confirmScan}
                                     disabled={loading}
-                                    className="flex-[2] bg-emerald-600 text-white font-extrabold py-3.5 rounded-xl hover:bg-emerald-500 shadow-lg shadow-emerald-600/20 active:scale-95 transition-all flex justify-center items-center gap-2"
+                                    className={`flex-[2] text-white font-extrabold py-3.5 rounded-xl shadow-lg active:scale-95 transition-all flex justify-center items-center gap-2 ${user.is_admin
+                                        ? 'bg-amber-500 hover:bg-amber-400 shadow-amber-500/20'
+                                        : 'bg-emerald-600 hover:bg-emerald-500 shadow-emerald-600/20'
+                                        }`}
                                 >
                                     {loading ? (
                                         <span className="size-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></span>

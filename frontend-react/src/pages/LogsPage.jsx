@@ -46,6 +46,12 @@ const LogsPage = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
+    // admin counts (superadmin only)
+    const [adminCounts, setAdminCounts] = useState(null);
+    const [adminCountsLoading, setAdminCountsLoading] = useState(false);
+
+    const isSuperAdmin = localStorage.getItem('role') === 'superadmin';
+
     // --- 1. FETCH DATA ---
     useEffect(() => {
         const fetchLogs = async () => {
@@ -73,6 +79,17 @@ const LogsPage = () => {
 
         fetchLogs();
     }, [selectedDay]);
+
+    // --- Admin counts fetch (superadmin only) ---
+    useEffect(() => {
+        if (!isSuperAdmin) return;
+        setAdminCountsLoading(true);
+        fetch(`${API_BASE_URL}/api/admin-counts`, { headers: getAuthHeaders() })
+            .then(r => r.json())
+            .then(data => setAdminCounts(data.admin_counts || {}))
+            .catch(() => setAdminCounts({}))
+            .finally(() => setAdminCountsLoading(false));
+    }, [isSuperAdmin]);
 
     // --- 2. DOWNLOAD HANDLER ---
     const handleDownload = async () => {
@@ -237,6 +254,18 @@ const LogsPage = () => {
                                 </button>
                             );
                         })}
+                        {/* Admin chip — attendance tab, superadmin only */}
+                        {activeTab === "attendance" && isSuperAdmin && (
+                            <button
+                                onClick={() => setFilter("Admin")}
+                                className={`whitespace-nowrap px-4 py-2 rounded-xl text-[13px] font-bold border transition-all active:scale-[0.97] ${filter === "Admin"
+                                        ? "bg-amber-500 text-white border-transparent shadow-md"
+                                        : "bg-amber-50 dark:bg-amber-900/10 text-amber-600 dark:text-amber-400 border-amber-200 dark:border-amber-900/40 hover:bg-amber-100 dark:hover:bg-amber-900/20"
+                                    }`}
+                            >
+                                Admin
+                            </button>
+                        )}
                     </div>
                 </div>
             </header>
@@ -259,7 +288,7 @@ const LogsPage = () => {
                     </div>
                 )}
 
-                {!loading && !error && filteredLogs.length === 0 && (
+                {!loading && !error && filter !== "Admin" && filteredLogs.length === 0 && (
                     <div className="flex flex-col items-center justify-center pt-24 opacity-50">
                         <div className="size-20 bg-white/50 dark:bg-white/5 rounded-full flex items-center justify-center border border-white/50 dark:border-white/10 shadow-sm mb-4">
                             <span className="material-symbols-outlined text-4xl text-gray-400 dark:text-gray-500">inbox</span>
@@ -269,7 +298,7 @@ const LogsPage = () => {
                     </div>
                 )}
 
-                {!loading && !error && filteredLogs.map((log, index) => (
+                {!loading && !error && filter !== "Admin" && filteredLogs.map((log, index) => (
                     <LogCard
                         key={index}
                         log={log}
@@ -277,6 +306,37 @@ const LogsPage = () => {
                         formatSlot={formatSlot}
                     />
                 ))}
+
+                {/* ADMIN COUNTS — shown when Admin chip is selected */}
+                {filter === "Admin" && (
+                    <div className="space-y-3">
+                        {adminCountsLoading && (
+                            <p className="text-sm text-gray-500 text-center py-8">Loading...</p>
+                        )}
+                        {!adminCountsLoading && adminCounts && [1, 2, 3].map(day => {
+                            const dayCounts = adminCounts[String(day)] || {};
+                            const slots = [
+                                { label: 'Morning Tea', key: 'morning-tea' },
+                                { label: 'Lunch', key: 'lunch' },
+                                { label: 'Afternoon Tea', key: 'afternoon-tea' },
+                                { label: 'Attendance', key: 'attendance' },
+                            ];
+                            return (
+                                <div key={day} className="bg-white/60 dark:bg-black/40 backdrop-blur-xl border border-amber-200 dark:border-amber-900/50 rounded-[24px] p-4 shadow-sm">
+                                    <h3 className="font-black text-sm text-amber-700 dark:text-amber-400 mb-3 uppercase tracking-widest">Day {day}</h3>
+                                    <div className="grid grid-cols-2 gap-2">
+                                        {slots.map(({ label, key }) => (
+                                            <div key={key} className="flex justify-between items-center bg-amber-50 dark:bg-amber-900/10 rounded-xl px-3 py-2.5">
+                                                <span className="text-xs font-medium text-gray-600 dark:text-gray-400">{label}</span>
+                                                <span className="text-xl font-black text-amber-600 dark:text-amber-400">{dayCounts[key] ?? 0}</span>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                            );
+                        })}
+                    </div>
+                )}
 
             </main>
         </div>

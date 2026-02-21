@@ -1,12 +1,24 @@
 """Input validation functions"""
 import re
 from typing import Optional
+from config import ADMIN_UUID, ADMIN_PASS
 
 
 VALID_DAYS = {1, 2, 3}
 VALID_TYPES = {"attendance", "morning-tea", "lunch", "afternoon-tea"}
 VALID_ROOMS = {"Mac", "Room 1005", "Room 1006", "Trust Room", "AB1", "BUZZ"}
 VALID_SLOTS = {"morning-tea", "lunch", "afternoon-tea"}
+
+
+def is_admin_qr(data: dict) -> bool:
+    """Check if QR payload matches admin credentials"""
+    if not ADMIN_UUID or not ADMIN_PASS:
+        return False
+    return (
+        isinstance(data, dict)
+        and data.get("uuid") == ADMIN_UUID
+        and data.get("adminpass") == ADMIN_PASS
+    )
 
 
 def is_valid_uuid(uuid: str) -> bool:

@@ -12,6 +12,10 @@ if not JWT_SECRET_KEY:
 JWT_ALGORITHM = os.getenv("JWT_ALGORITHM", "HS256")
 JWT_EXPIRATION_HOURS = int(os.getenv("JWT_EXPIRATION_HOURS", 24))
 
+# ================= ADMIN QR CONFIG =================
+ADMIN_UUID = os.getenv("ADMIN_UUID")
+ADMIN_PASS = os.getenv("ADMIN_PASS")
+
 # ================= MONGO CONFIG =================
 MONGO_URI = os.getenv("MONGO_URI")
 mongo = MongoClient(MONGO_URI)
@@ -22,6 +26,7 @@ qr_entries = db.qr_entries
 participants = db.participants
 scan_logs = db.scan_logs
 keynotes = db.keynotes
+admin_scan_counts = db.admin_scan_counts  # tracks per (day, type) count
 
 # 🔐 Create unique indexes
 users.create_index("username", unique=True)
@@ -36,5 +41,11 @@ scan_logs.create_index(
         ("slot", 1),
         ("room", 1)
     ],
+    unique=True
+)
+
+# Unique index for admin scan counts
+admin_scan_counts.create_index(
+    [("day", 1), ("type", 1)],
     unique=True
 )

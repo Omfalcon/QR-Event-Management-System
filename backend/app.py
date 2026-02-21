@@ -5,7 +5,7 @@ import tempfile
 
 from qr_service import validate_qr
 from scan_service import confirm_scan
-from logs_service import get_logs, download_logs
+from logs_service import get_logs, download_logs, get_admin_counts
 from auth_service import register_user, login_user, get_current_user, create_manager, get_all_managers, update_manager, delete_manager
 from auth_middleware import require_auth
 from excel_service import get_sent_participants, analyze_excel_upload, process_excel_upload_stream
@@ -78,6 +78,12 @@ def logs_route():
 @require_auth
 def download_logs_route():
     return download_logs()
+
+
+@app.route("/api/admin-counts", methods=["GET"])
+@require_auth
+def admin_counts_route():
+    return get_admin_counts()
 
 
 # --- MS Auth Routes ---
