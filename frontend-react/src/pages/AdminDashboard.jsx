@@ -15,6 +15,7 @@ const AdminDashboard = () => {
 
     const adminActions = [
         { title: 'Email Manager', desc: 'Excel & Logs', icon: 'mail', path: '/emails', color: 'text-indigo-500' },
+        { title: 'QR Generator', desc: 'Name · Email · Phone', icon: 'qr_code_2', path: '/qr-generator', color: 'text-green-500' },
         { title: 'Add Manager', desc: 'New accounts', icon: 'person_add', path: '/addmanagers', color: 'text-blue-500' },
         { title: 'View Logs', desc: 'Live attendance', icon: 'history', path: '/logs', color: 'text-teal-500' },
         { title: 'Manage Keynotes', desc: 'Speakers & Schedule', icon: 'mic_external_on', path: '/keynote-manager', color: 'text-orange-500' },

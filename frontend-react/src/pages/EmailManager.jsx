@@ -14,6 +14,9 @@ const EmailManager = () => {
     const [fileToUpload, setFileToUpload] = useState(null);
     const [analysisResult, setAnalysisResult] = useState(null);
     const [progress, setProgress] = useState({ status: 'idle', current: 0, total: 0, message: '' });
+    const [search, setSearch] = useState('');
+    const [resendingEmail, setResendingEmail] = useState(null); // email currently being resent
+    const [resendMsg, setResendMsg] = useState(null); // { type, text }
 
     const startUploadStream = async () => {
         if (!fileToUpload) return;
@@ -110,6 +113,25 @@ const EmailManager = () => {
     useEffect(() => {
         fetchSentParticipants();
     }, []);
+
+    const handleResend = async (email) => {
+        setResendingEmail(email);
+        setResendMsg(null);
+        try {
+            const res = await fetch(`${API_BASE_URL}/api/participants/resend`, {
+                method: 'POST',
+                headers: getAuthHeaders(),
+                body: JSON.stringify({ email })
+            });
+            const data = await res.json();
+            setResendMsg({ type: res.ok ? 'success' : 'error', text: data.message || data.error });
+        } catch (err) {
+            setResendMsg({ type: 'error', text: 'Network error' });
+        } finally {
+            setResendingEmail(null);
+            setTimeout(() => setResendMsg(null), 4000);
+        }
+    };
 
     return (
         <div className="max-w-[480px] mx-auto bg-slate-50 dark:bg-[#0a0a0a] min-h-screen flex flex-col relative transition-colors duration-500 font-sans overflow-x-hidden">
@@ -270,11 +292,10 @@ const EmailManager = () => {
 
                     {/* STATUS / PROGRESS UI */}
                     {progress.status !== 'idle' && (
-                        <div className={`mt-2 rounded-2xl p-4 border backdrop-blur-md ${
-                            progress.status === 'error' ? 'bg-red-500/10 border-red-500/20 text-red-700 dark:text-red-400' :
+                        <div className={`mt-2 rounded-2xl p-4 border backdrop-blur-md ${progress.status === 'error' ? 'bg-red-500/10 border-red-500/20 text-red-700 dark:text-red-400' :
                             progress.status === 'success' ? 'bg-green-500/10 border-green-500/20 text-green-700 dark:text-green-400' :
-                            'bg-white/40 dark:bg-white/5 border-white/50 dark:border-white/10 text-gray-800 dark:text-gray-200'
-                        }`}>
+                                'bg-white/40 dark:bg-white/5 border-white/50 dark:border-white/10 text-gray-800 dark:text-gray-200'
+                            }`}>
                             <div className="flex justify-between items-center mb-2.5">
                                 <span className="font-bold text-sm flex items-center gap-2">
                                     {progress.status === 'sending' && <span className="size-4 border-2 border-indigo-600 dark:border-indigo-400 border-t-transparent rounded-full animate-spin"></span>}
@@ -304,7 +325,7 @@ const EmailManager = () => {
                     )}
                 </section>
 
-                {/* 2. Sent Emails List - Sleek Frosted Hub */}
+                {/* 2. Sent Emails List */}
                 <section className="flex flex-col gap-2 mt-2">
                     <div className="flex items-center justify-between px-2 mb-1">
                         <h3 className="text-[12px] font-bold text-gray-500 dark:text-gray-400 uppercase tracking-widest">
@@ -315,24 +336,64 @@ const EmailManager = () => {
                         </span>
                     </div>
 
+                    {/* Search Box */}
+                    <div className="relative mb-1">
+                        <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-[18px] text-gray-400">search</span>
+                        <input
+                            type="text"
+                            placeholder="Search by name or email..."
+                            value={search}
+                            onChange={e => setSearch(e.target.value)}
+                            className="w-full pl-10 pr-4 py-2.5 rounded-2xl bg-white/60 dark:bg-black/30 backdrop-blur-xl border border-white/50 dark:border-white/10 text-sm font-medium text-gray-800 dark:text-gray-200 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-400/50 shadow-sm"
+                        />
+                        {search && (
+                            <button onClick={() => setSearch('')} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
+                                <span className="material-symbols-outlined text-[18px]">close</span>
+                            </button>
+                        )}
+                    </div>
+
+                    {/* Resend status toast */}
+                    {resendMsg && (
+                        <div className={`text-xs font-bold px-4 py-2.5 rounded-xl border ${resendMsg.type === 'success'
+                            ? 'bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-400 border-green-200 dark:border-green-800'
+                            : 'bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-400 border-red-200 dark:border-red-800'
+                            }`}>{resendMsg.text}</div>
+                    )}
+
                     <div className="bg-white/50 dark:bg-black/30 backdrop-blur-xl border border-white/50 dark:border-white/5 rounded-[24px] overflow-hidden shadow-sm">
                         {loading ? (
                             <div className="p-8 text-center text-sm font-medium text-gray-400">Syncing data...</div>
                         ) : sentParticipants.length === 0 ? (
                             <div className="p-8 text-center text-sm font-medium text-gray-400">No emails sent yet.</div>
                         ) : (
-                            <div className="divide-y divide-gray-200/50 dark:divide-gray-800/50 max-h-[300px] overflow-y-auto custom-scrollbar">
-                                {sentParticipants.map((p, i) => (
-                                    <div key={i} className="p-4 flex items-center justify-between hover:bg-white/40 dark:hover:bg-white/5 transition-colors">
-                                        <div className="flex flex-col">
-                                            <p className="font-semibold text-[14px] text-gray-900 dark:text-gray-100 leading-tight">{p.name}</p>
-                                            <p className="text-[12px] font-medium text-gray-500 dark:text-gray-400 mt-0.5">{p.email}</p>
+                            <div className="divide-y divide-gray-200/50 dark:divide-gray-800/50 max-h-[400px] overflow-y-auto custom-scrollbar">
+                                {sentParticipants
+                                    .filter(p =>
+                                        !search ||
+                                        p.name?.toLowerCase().includes(search.toLowerCase()) ||
+                                        p.email?.toLowerCase().includes(search.toLowerCase())
+                                    )
+                                    .map((p, i) => (
+                                        <div key={i} className="p-4 flex items-center justify-between gap-3 hover:bg-white/40 dark:hover:bg-white/5 transition-colors">
+                                            <div className="flex flex-col min-w-0">
+                                                <p className="font-semibold text-[14px] text-gray-900 dark:text-gray-100 leading-tight truncate">{p.name}</p>
+                                                <p className="text-[12px] font-medium text-gray-500 dark:text-gray-400 mt-0.5 truncate">{p.email}</p>
+                                            </div>
+                                            <button
+                                                onClick={() => handleResend(p.email)}
+                                                disabled={resendingEmail === p.email}
+                                                className="shrink-0 flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-[11px] font-bold bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-500/20 hover:bg-indigo-100 dark:hover:bg-indigo-500/20 active:scale-95 transition-all disabled:opacity-50"
+                                            >
+                                                {resendingEmail === p.email ? (
+                                                    <span className="size-3.5 border-2 border-indigo-400 border-t-transparent rounded-full animate-spin"></span>
+                                                ) : (
+                                                    <span className="material-symbols-outlined text-[14px]">send</span>
+                                                )}
+                                                Resend
+                                            </button>
                                         </div>
-                                        <div className="size-8 rounded-full bg-green-50 dark:bg-green-500/10 flex items-center justify-center border border-green-200 dark:border-green-500/20 shrink-0">
-                                            <span className="material-symbols-outlined text-green-500 dark:text-green-400 text-[18px]">check</span>
-                                        </div>
-                                    </div>
-                                ))}
+                                    ))}
                             </div>
                         )}
                     </div>

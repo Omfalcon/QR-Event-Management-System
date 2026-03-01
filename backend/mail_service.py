@@ -121,10 +121,102 @@ def send_mail_with_qr(to_email, name, qr_content):
 
         mail = {
             "message": {
-                "subject": "Your Event Entry Pass",
+                "subject": "IYRC 2026 – Your Official Registration QR Code",
                 "body": {
-                    "contentType": "Text",
-                    "content": f"Hi {name},\n\nPlease find your QR Code attached.\n\nSee you at the event!"
+                    "contentType": "HTML",
+                    "content": f"""
+        <p>Dear Participant,</p>
+
+        <p>Warm greetings from UPES R&amp;D and CIDRI!</p>
+
+        <p>
+        We are delighted to welcome you to the 4th International Young Researchers’ Conclave (IYRC 2026), 
+        scheduled from 26–28 February 2026 at UPES, Dehradun. Your participation adds real value to this platform 
+        that brings together young researchers, faculty, industry professionals, and policy stakeholders to discuss 
+        innovation, translational research, and interdisciplinary collaboration.
+        </p>
+
+        <p>
+        IYRC is not just a conference. It is an exhibition of active research, a networking forum, 
+        and a space where ideas move closer to implementation. We look forward to your engagement 
+        across sessions, discussions, and interactions during the conclave.
+        </p>
+
+        <p><b>Download Registration QR Code</b></p>
+
+        <p>
+        Attached in this email is your unique QR code, which will serve as your official 
+        registration ID for IYRC 2026.
+        </p>
+
+        <p>This QR code will be used for:</p>
+        <ul>
+        <li>On-site registration</li>
+        <li>Session attendance marking</li>
+        <li>Food access</li>
+        <li>ID card validation</li>
+        <li>Entry verification at designated areas</li>
+        </ul>
+
+        <p><b>Important Conference Resources</b></p>
+
+        <p>Please find below the key documents for your reference:</p>
+        <ul>
+        <li>Abstracts Book</li>
+        <li>R&amp;D Newsletter</li>
+        <li>Detailed Program Schedule (Day-wise)</li>
+        </ul>
+
+        <p>
+        <a href="https://drive.google.com/drive/folders/1hOFFMYmct1Ql8qPk3PXXyGuNF7vzgyRv?usp=sharing">
+        Click here to access conference documents
+        </a>
+        </p>
+
+        <p><b>You may download the files and save on your phone/laptop for easy access.</b></p>
+
+        <p>For immediate help you may contact Volunteers who will be available.</p>
+
+        <p><b>Standard Operating Procedure (SOP) – Paperless Conference Initiative</b></p>
+
+        <p>
+        IYRC 2026 is being conducted as a fully paperless event, aligned with UPES’ sustainability 
+        and digital efficiency goals.
+        </p>
+
+        <p>Here is what you need to do:</p>
+        <ul>
+        <li>Keep your QR code accessible on your mobile device at all times.</li>
+        <li>You may keep a printed copy as backup, though it is not mandatory.</li>
+        <li>Present your QR code at registration counters and session venues.</li>
+        <li>Our volunteers will scan the code at relevant checkpoints.</li>
+        <li>No manual signatures, paper coupons, or physical attendance sheets will be used.</li>
+        <li>This system ensures faster processing, accurate attendance records, and minimal waiting time.</li>
+        </ul>
+
+        <p>
+        We request your full cooperation in supporting this initiative and helping us execute a smooth, 
+        environmentally responsible conference.
+        </p>
+
+        <p>
+        If you require any clarification prior to the event, please feel free to write to us at:<br>
+        <a href="mailto:researchconclave@ddn.upes.ac.in">researchconclave@ddn.upes.ac.in</a>
+        </p>
+
+        <p>
+        We look forward to welcoming you personally at UPES and making IYRC 2026 
+        a meaningful and memorable experience.
+        </p>
+
+        <p>
+        Warm regards,<br>
+        Organizing Committee<br>
+        IYRC 2026<br>
+        UPES R&amp;D &amp; CIDRI<br>
+        UPES, Dehradun
+        </p>
+        """
                 },
                 "toRecipients": [{"emailAddress": {"address": to_email}}],
                 "attachments": attachments

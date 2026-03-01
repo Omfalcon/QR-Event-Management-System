@@ -26,6 +26,7 @@ import SpeakerProfile from './pages/SpeakerProfile';
 import Feedback from './pages/Feedback';
 import KeynoteManager from './pages/KeynoteManager';
 import FeedbackStats from './pages/FeedbackStats';
+import QRGenerator from './pages/QRGenerator';
 
 function AppContent() {
   useBackButton();
@@ -91,6 +92,11 @@ function AppContent() {
       <Route
         path="/feedback-stats"
         element={<RequireAuth allowedRoles={['superadmin']}><FeedbackStats /></RequireAuth>}
+      />
+
+      <Route
+        path="/qr-generator"
+        element={<RequireAuth allowedRoles={['superadmin']}><QRGenerator /></RequireAuth>}
       />
 
       {/* Fallback */}

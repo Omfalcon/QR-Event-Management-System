@@ -8,7 +8,7 @@ from scan_service import confirm_scan
 from logs_service import get_logs, download_logs, get_admin_counts
 from auth_service import register_user, login_user, get_current_user, create_manager, get_all_managers, update_manager, delete_manager
 from auth_middleware import require_auth
-from excel_service import get_sent_participants, analyze_excel_upload, process_excel_upload_stream
+from excel_service import get_sent_participants, analyze_excel_upload, process_excel_upload_stream, resend_participant, generate_qr_manual
 from mail_service import get_auth_url, process_callback
 
 app = Flask(__name__)
@@ -155,7 +155,47 @@ def get_sent_participants_route():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
-# --- Keynotes API ---
+@app.route("/api/participants/resend", methods=["POST"])
+@require_auth
+def resend_participant_route():
+    data = request.get_json()
+    email = data.get("email") if data else None
+    if not email:
+        return jsonify({"error": "Email required"}), 400
+    result, status = resend_participant(email)
+    return jsonify(result), status
+
+
+@app.route("/api/participants/generate-qr", methods=["POST"])
+@require_auth
+def generate_qr_manual_route():
+    """Generate QR + store in DB for a manually-entered participant. Returns PNG for download."""
+    user_role = request.current_user.get("role")
+    if user_role != "superadmin":
+        return jsonify({"error": "Unauthorized"}), 403
+
+    data = request.get_json()
+    name = (data.get("name") or "").strip()
+    email = (data.get("email") or "").strip()
+    phone = (data.get("phone") or "").strip()
+
+    if not name or not email or not phone:
+        return jsonify({"error": "name, email and phone are all required"}), 400
+
+    try:
+        img_bytes, uid = generate_qr_manual(name, email, phone)
+        filename = f"{name.replace(' ', '_')}_QR.png"
+        return Response(
+            img_bytes,
+            mimetype="image/png",
+            headers={
+                "Content-Disposition": f'attachment; filename="{filename}"',
+                "X-Participant-UUID": uid
+            }
+        )
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
 from keynotes_service import get_all_keynotes, update_keynote
 
 @app.route("/api/keynotes", methods=["GET"])
