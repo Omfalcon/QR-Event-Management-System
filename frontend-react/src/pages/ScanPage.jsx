@@ -2,6 +2,8 @@ import { useSearchParams, useNavigate } from "react-router-dom";
 import { useRef, useState, useEffect } from "react";
 import { Html5Qrcode } from "html5-qrcode";
 import { API_BASE_URL, getAuthHeaders } from "../config";
+import { Capacitor } from "@capacitor/core";
+import { Camera } from "@capacitor/camera";
 
 const ScanPage = () => {
     const [params] = useSearchParams();
@@ -58,6 +60,19 @@ const ScanPage = () => {
         if (isRunningRef.current) return; // Prevent double clicks
 
         setMsg(null);
+        
+        try {
+            if (Capacitor.isNativePlatform()) {
+                const permissions = await Camera.requestPermissions();
+                if (permissions.camera !== 'granted' && permissions.camera !== 'prompt-with-rationale') {
+                    setMsg({ type: "error", text: "Camera permission denied" });
+                    return;
+                }
+            }
+        } catch (e) {
+            console.log("Permission check failed", e);
+        }
+
         setIsCameraRunning(true);
         isRunningRef.current = true;
 
