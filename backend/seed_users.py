@@ -5,8 +5,8 @@ from datetime import datetime
 def seed_super_admin():
     print("🚀 Seeding Super Admin user...")
     
-    username = "shubhi"
-    password = "password123" # User should change this!
+    username = "om"
+    password = "123" # User should change this!
     
     existing = users.find_one({"username": username})
     if existing:
