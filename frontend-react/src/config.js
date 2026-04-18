@@ -1,5 +1,5 @@
 // API Configuration new
-export const API_BASE_URL = " http://135.235.195.46";
+export const API_BASE_URL = "https://confrence.bhook.food";
 
 // Helper function to get auth headers
 export const getAuthHeaders = () => {
