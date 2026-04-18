@@ -1,16 +1,86 @@
-# 🚀 Flask Backend Deployment (EC2 + Gunicorn + Nginx + HTTPS)
+# 🚀 Flask Backend Deployment (EC2 + CI/CD + Gunicorn + Nginx + HTTPS)
 
-This guide walks through deploying a Flask backend on AWS EC2 using **Gunicorn**, **Nginx**, and **HTTPS (Certbot)**.
+This guide covers:
+
+* ✅ CI/CD deployment using GitHub Actions
+* ✅ Manual SCP upload (fallback method)
+* ✅ Flask setup with Gunicorn
+* ✅ Nginx reverse proxy
+* ✅ HTTPS with Certbot
 
 ---
 
-# 📦 Step 1: Upload & Setup Backend
+# 🔄 Step 0: CI/CD Pipeline (GitHub → EC2)
+
+## 🔹 GitHub Secrets
+
+Go to **Repo → Settings → Secrets → Actions** and add:
+
+```
+EC2_HOST = your-ec2-ip
+EC2_USER = falcon
+EC2_KEY  = (paste full .pem content)
+```
+
+---
+
+## 🔹 GitHub Workflow
+
+Create file:
+
+```
+.github/workflows/deploy.yml
+```
+
+```yaml
+name: Deploy Flask App
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Deploy to EC2
+      uses: appleboy/ssh-action@v0.1.10
+      with:
+        host: ${{ secrets.EC2_HOST }}
+        username: ${{ secrets.EC2_USER }}
+        key: ${{ secrets.EC2_KEY }}
+        script: |
+          cd /home/falcon/backend
+          git pull origin main
+          source venv/bin/activate
+          pip install -r requirements.txt
+          sudo systemctl restart flaskapp
+```
+
+---
+
+## 🔹 How it works
+
+```
+git push → GitHub Actions → SSH → EC2 → Pull → Restart
+```
+
+---
+
+# 📦 Step 1: Upload & Setup Backend (Manual SCP Method)
 
 ## 🔹 Upload project
 
 ```bash
-scp -i C:\Users\hp\Downloads\ieee_quiz.pem backend.rar ubuntu@135.235.195.46:/home/ubuntu
+scp -i C:\Users\hp\Downloads\ieee_quiz.pem backend.rar ubuntu@your-ec2-ip:/home/ubuntu
 ```
+
+---
 
 ## 🔹 Extract files
 
@@ -96,6 +166,8 @@ sudo systemctl enable flaskapp
 sudo apt install nginx -y
 ```
 
+---
+
 ## 🔹 Create config
 
 ```bash
@@ -128,6 +200,8 @@ sudo ln -s /etc/nginx/sites-available/flaskapp /etc/nginx/sites-enabled
 sudo nginx -t
 sudo systemctl restart nginx
 ```
+
+---
 
 ## 🔹 Remove default config
 
@@ -185,8 +259,6 @@ Redirect HTTP → HTTPS → YES
 
 # 🎉 Final Result
 
-Your backend is now live at:
-
 ```
 https://confrence.bhook.food
 ```
@@ -195,8 +267,8 @@ https://confrence.bhook.food
 
 # ⚠️ Important Notes
 
-* Ensure domain DNS → EC2 IP (A record)
-* Open ports in EC2:
+* Ensure DNS → EC2 IP (A record)
+* Open ports:
 
   * 80 (HTTP)
   * 443 (HTTPS)
