@@ -107,7 +107,7 @@ pip install -r requirements.txt
 
 ```bash
 pip install gunicorn
-gunicorn --bind 0.0.0.0:5000 run:main
+gunicorn --bind 0.0.0.0:5000 run:app
 ```
 
 👉 Test:
@@ -138,12 +138,14 @@ WorkingDirectory=/home/falcon/backend
 Environment="PATH=/home/falcon/backend/venv/bin"
 
 ExecStart=/home/falcon/backend/venv/bin/gunicorn \
-    --workers 3 \
-    --bind 127.0.0.1:5000 \
-    app:app
+-k geventwebsocket.gunicorn.workers.GeventWebSocketWorker \
+-w 1 \
+--bind 127.0.0.1:5000 \
+run:app
 
 [Install]
 WantedBy=multi-user.target
+
 ```
 
 ---
@@ -189,6 +191,22 @@ server {
         proxy_set_header X-Forwarded-Proto $scheme;
     }
 }
+
+location /socket.io/ {
+    proxy_pass http://127.0.0.1:5000/socket.io/;
+
+    proxy_http_version 1.1;
+
+    proxy_set_header Upgrade $http_upgrade;
+    proxy_set_header Connection "Upgrade";
+
+    proxy_set_header Host $host;
+    proxy_set_header X-Real-IP $remote_addr;
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+
+    proxy_read_timeout 86400;
+    proxy_send_timeout 86400;
+}
 ```
 
 ---
@@ -201,6 +219,8 @@ sudo nginx -t
 sudo systemctl restart nginx
 ```
 
+for cors 
+update in env ,config.py(socket.io/)
 ---
 
 ## 🔹 Remove default config
@@ -246,7 +266,7 @@ server_name confrence.bhook.food;
 ## 🔹 Install SSL
 
 ```bash
-sudo certbot --nginx -d confrence.bhook.food
+sudo certbot --nginx -d domain
 ```
 
 👉 Choose:
@@ -260,7 +280,7 @@ Redirect HTTP → HTTPS → YES
 # 🎉 Final Result
 
 ```
-https://confrence.bhook.food
+https://domain
 ```
 
 ---
