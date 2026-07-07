@@ -47,7 +47,7 @@ const AdminDashboard = () => {
                         </div>
                         <div>
                             <h1 className="text-xl font-black tracking-tight text-gray-900 dark:text-white leading-none">
-                                IYRC 2026
+                                Conference
                             </h1>
                             <span className="text-[11px] font-bold bg-clip-text text-transparent bg-gradient-to-r from-purple-600 to-blue-500 dark:from-purple-400 dark:to-blue-400 uppercase tracking-widest">
                                 Super Admin
